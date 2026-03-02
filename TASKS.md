@@ -10,10 +10,11 @@
 - [ ] Email notifications
 - [ ] Testing suite
 - [ ] CSV import (upload + preview + validate)
+- [ ] Migrate `middleware.ts` → `proxy.ts` (Next.js 16 convention)
 
 ### Pending Setup
-- [ ] Sign up a test user, then apply seed data (`supabase/seed.sql`)
-- [ ] Connect Vercel to GitHub repo
+- [ ] Add Vercel URL to Supabase redirect URLs (`https://hokenlife-crm.vercel.app/**`)
+- [ ] Redeploy to Vercel WITH middleware once Vercel fixes global middleware deployment issue
 - [ ] Set up Stripe keys + webhook endpoint in `.env.local`
 - [ ] Add `STRIPE_STARTER_PRICE_ID` + `STRIPE_PROFESSIONAL_PRICE_ID` to `.env.local`
 - [ ] Configure Google OAuth in Supabase dashboard
@@ -55,3 +56,5 @@
 - [x] Seed data — 20 contacts, 30 policies, 10 claims, 15 leads, 25 activities (2026-03-02)
 - [x] CSV export — download buttons on contacts, policies, claims, leads tables (2026-03-02)
 - [x] RBAC — permissions utility, role checks in all server actions, role-based sidebar/settings/middleware, team management page (2026-03-02)
+- [x] Create admin test account (`god@hokenlife.com`) + apply seed data (2026-03-02)
+- [x] Deploy to Vercel — `https://hokenlife-crm.vercel.app` (without middleware due to Vercel infra issue) (2026-03-02)

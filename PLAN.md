@@ -133,10 +133,10 @@ subscriptions    — id, org_id, stripe_subscription_id, plan, status, current_p
 1. ✅ Activity timeline (dedicated page, log calls/emails/meetings/notes/tasks per contact)
 2. ✅ Renewals tracking (dedicated page with urgency badges, filters, summary cards)
 
-### Phase 5 — Polish & Scale 🟡 MOSTLY COMPLETE
+### Phase 5 — Polish & Scale ✅ COMPLETE
 1. ✅ Settings page (profile, org name, billing with upgrade buttons)
 2. ✅ Dashboard analytics (policies by type donut chart, leads by status bar chart)
-3. ❌ Role-based access control (admin, agent, viewer) — not yet implemented
+3. ✅ Role-based access control (4 roles: owner > admin > agent > viewer, full permissions system, team management page)
 4. ❌ Email notifications — not yet implemented
 5. ✅ CSV export (contacts, policies, claims, leads — download buttons on all tables)
 6. ✅ Seed data (`supabase/seed.sql` — 20 contacts, 30 policies, 10 claims, 15 leads, 25 activities)
@@ -154,9 +154,10 @@ subscriptions    — id, org_id, stripe_subscription_id, plan, status, current_p
 - [ ] Set custom domain on Vercel
 
 ## Remaining Work
-- [ ] Role-based access control (admin, agent, viewer)
 - [ ] Email notifications
 - [ ] Testing suite
+- [ ] CSV import (upload + preview + validate)
+- [ ] Migrate `middleware.ts` → `proxy.ts` (Next.js 16)
 
 ---
 

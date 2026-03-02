@@ -198,3 +198,46 @@
 - Set up Stripe keys to test checkout flow
 - Connect Vercel for deployment
 - Or: email notifications / testing suite / CSV import
+
+---
+
+## Session 6 — 2026-03-02
+
+**Focus**: Test account setup + Vercel deployment
+
+### Completed
+- **Admin test account** created via Supabase Admin API
+  - Email: `god@hokenlife.com`, Password: `Brinkscode17`, Role: `owner`
+  - User ID: `8d1a7216-249f-4c31-8ed1-270026e990c5`
+  - Org ID: `23583b77-9035-48c6-8b0a-163b8bd464bb`
+  - Auto-signup trigger created org ("God Admin's Organization") + profile
+- **Seed data applied** — 20 contacts, 30 policies, 10 claims, 15 leads, 25 activities
+- **Vercel deployment** — `https://hokenlife-crm.vercel.app`
+  - Vercel CLI linked to project `hokenlife-crm` under `sunticodes-8443s-projects`
+  - All env vars set for production (SUPABASE_URL, ANON_KEY, SERVICE_ROLE_KEY, DB_URL, APP_URL)
+  - Build succeeds (19 routes, all compile cleanly)
+  - Deployed WITHOUT middleware — Vercel has active infrastructure issue with global middleware deployment ("Deploying outputs" phase fails)
+  - Added `vercel.json` with framework config
+  - Added `engines.node: ">=20.0.0"` to package.json
+- **Dev server** moved to port 3001 (updated `NEXT_PUBLIC_APP_URL` in `.env.local`)
+
+### Known Issues
+- **Vercel middleware deployment broken** — Vercel infrastructure issue causes production deploys with middleware to fail at "Deploying outputs" phase. Current deploy has NO middleware (no route protection on prod). See: https://community.vercel.com/t/vercel-deployment-failure-with-internal-error-during-deploying-outputs-phase/34782
+- **Supabase redirect URLs** — need to add `https://hokenlife-crm.vercel.app/**` in Supabase dashboard for auth to work on production
+- **middleware.ts deprecated** — Next.js 16 uses `proxy.ts` instead; current middleware still works but shows deprecation warning
+
+### Git State
+- Branch: `main`
+- Working tree: `package.json` modified, `vercel.json` added (uncommitted)
+- `.vercel/` directory created (gitignored by default)
+
+### Where We Left Off
+- App is live at `https://hokenlife-crm.vercel.app` (landing page, pricing, login work; middleware not active)
+- Locally running on `http://localhost:3001` with full middleware protection
+- Test account ready: `god@hokenlife.com` / `Brinkscode17` (owner role, seed data loaded)
+
+### Recommended Next Action
+- Add Vercel URL to Supabase redirect URLs for auth on production
+- Redeploy with middleware once Vercel fixes their issue (or migrate to `proxy.ts`)
+- Set up Stripe keys to test checkout flow
+- Or: build remaining features (email notifications, testing suite, CSV import)
