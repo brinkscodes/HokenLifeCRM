@@ -12,6 +12,7 @@
 - [ ] CSV import (upload + preview + validate)
 
 ### Pending Setup
+- [ ] Sign up a test user, then apply seed data (`supabase/seed.sql`)
 - [ ] Connect Vercel to GitHub repo
 - [ ] Set up Stripe keys + webhook endpoint in `.env.local`
 - [ ] Add `STRIPE_STARTER_PRICE_ID` + `STRIPE_PROFESSIONAL_PRICE_ID` to `.env.local`

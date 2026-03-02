@@ -182,17 +182,19 @@
 
 ### Git State
 - Branch: `main`
-- Latest commit: pending (RBAC feature)
+- Latest commit: `b73ffa5` — RBAC complete
+- Remote: `origin/main` is up to date
+- Working tree: clean
 
 ### Where We Left Off
-- Phases 1–5 fully complete (RBAC done)
+- Phases 1–5 fully complete (all features built)
 - Remaining features: email notifications, testing suite, CSV import
 - User has NOT yet: connected Vercel, set up Stripe keys, configured Google OAuth
-- Seed data ready but not yet applied
+- Seed data ready but not yet applied (`supabase/seed.sql`)
+- `Project Details/` folder exists in repo root (untracked, external docs)
 
 ### Recommended Next Action
-- Commit and push RBAC to GitHub
 - Sign up a test user and apply seed data
 - Set up Stripe keys to test checkout flow
 - Connect Vercel for deployment
-- Or: email notifications / testing suite
+- Or: email notifications / testing suite / CSV import
