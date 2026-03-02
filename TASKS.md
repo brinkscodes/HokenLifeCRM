@@ -6,27 +6,18 @@
 
 ## Next Up
 
-### Phase 4 — Insurance Modules
-- [ ] Activity timeline per contact
-- [ ] Renewals tracking / notifications
-
-### Phase 5 — Polish & Scale
-- [ ] Settings page (org name, profile, billing)
-- [ ] Dashboard analytics (charts with real data)
+### Remaining Features
 - [ ] Role-based access control (admin, agent, viewer)
 - [ ] Email notifications
-- [ ] Export/import (CSV)
-- [ ] Seed data for development
 - [ ] Testing suite
-- [ ] Global search (across contacts, policies, claims, leads)
+- [ ] CSV import (upload + preview + validate)
 
 ### Pending Setup
 - [ ] Connect Vercel to GitHub repo
-- [ ] Set up Stripe keys + webhook endpoint
+- [ ] Set up Stripe keys + webhook endpoint in `.env.local`
+- [ ] Add `STRIPE_STARTER_PRICE_ID` + `STRIPE_PROFESSIONAL_PRICE_ID` to `.env.local`
 - [ ] Configure Google OAuth in Supabase dashboard
 - [ ] Set custom domain on Vercel
-- [ ] Implement sign-up → free trial → Stripe checkout flow
-- [ ] Build dedicated pricing page
 
 ---
 
@@ -53,3 +44,13 @@
 - [x] Claims CRUD — linked to policies, status workflow (2026-03-02)
 - [x] Leads pipeline — linked to contacts, assignable, value tracking (2026-03-02)
 - [x] Dashboard wired with real KPI data from Supabase (2026-03-02)
+- [x] Dedicated pricing page with 3-tier cards + FAQ (2026-03-02)
+- [x] Password reset flow — forgot-password + update-password (2026-03-02)
+- [x] Stripe checkout API route — creates sessions for authenticated users (2026-03-02)
+- [x] Activity timeline — dedicated page, log calls/emails/meetings/notes/tasks (2026-03-02)
+- [x] Renewals tracking — dedicated page with urgency badges + filters (2026-03-02)
+- [x] Settings page — profile, org name, billing with upgrade buttons (2026-03-02)
+- [x] Global search — Cmd+K command palette across all data (2026-03-02)
+- [x] Dashboard analytics — policies by type chart, leads by status chart (2026-03-02)
+- [x] Seed data — 20 contacts, 30 policies, 10 claims, 15 leads, 25 activities (2026-03-02)
+- [x] CSV export — download buttons on contacts, policies, claims, leads tables (2026-03-02)

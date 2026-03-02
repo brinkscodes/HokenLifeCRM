@@ -8,6 +8,8 @@ import {
   FileText,
   ShieldAlert,
   Target,
+  Activity,
+  CalendarClock,
   Settings,
   LogOut,
   ChevronLeft,
@@ -27,6 +29,8 @@ const navItems = [
   { label: "Policies", href: "/dashboard/policies", icon: FileText },
   { label: "Claims", href: "/dashboard/claims", icon: ShieldAlert },
   { label: "Leads", href: "/dashboard/leads", icon: Target },
+  { label: "Activities", href: "/dashboard/activities", icon: Activity },
+  { label: "Renewals", href: "/dashboard/renewals", icon: CalendarClock },
   { label: "Settings", href: "/dashboard/settings", icon: Settings },
 ];
 

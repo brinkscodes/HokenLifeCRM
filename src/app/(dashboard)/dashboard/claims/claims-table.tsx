@@ -8,9 +8,10 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { MoreHorizontal, Pencil, Trash2, Search, Plus } from "lucide-react";
+import { MoreHorizontal, Pencil, Trash2, Search, Plus, Download } from "lucide-react";
 import { ClaimForm } from "./claim-form";
 import { deleteClaim } from "./actions";
+import { downloadCSV } from "@/lib/csv";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type ClaimWithPolicy = any;
@@ -58,10 +59,32 @@ export function ClaimsTable({ claims, policies }: ClaimsTableProps) {
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input placeholder="Search claims..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-10" />
         </div>
-        <Button onClick={() => setCreateOpen(true)} className="bg-gradient-to-r from-[#92FE9D] to-[#00C9FF] text-black font-semibold hover:opacity-90">
-          <Plus className="mr-2 h-4 w-4" />
-          File Claim
-        </Button>
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() =>
+              downloadCSV(
+                claims.map((c) => ({
+                  claim_number: c.claim_number,
+                  policy_number: c.policies?.policy_number || "",
+                  status: c.status,
+                  amount: c.amount,
+                  description: c.description,
+                  filed_date: c.filed_date,
+                })),
+                "claims"
+              )
+            }
+            title="Export CSV"
+          >
+            <Download className="h-4 w-4" />
+          </Button>
+          <Button onClick={() => setCreateOpen(true)} className="bg-gradient-to-r from-[#92FE9D] to-[#00C9FF] text-black font-semibold hover:opacity-90">
+            <Plus className="mr-2 h-4 w-4" />
+            File Claim
+          </Button>
+        </div>
       </div>
 
       <div className="rounded-lg border border-border/50 bg-card/80 backdrop-blur-sm">

@@ -10,9 +10,10 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { MoreHorizontal, Pencil, Trash2, Search, Plus } from "lucide-react";
+import { MoreHorizontal, Pencil, Trash2, Search, Plus, Download } from "lucide-react";
 import { PolicyForm } from "./policy-form";
 import { deletePolicy } from "./actions";
+import { downloadCSV } from "@/lib/csv";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type PolicyWithContact = any;
@@ -61,10 +62,33 @@ export function PoliciesTable({ policies, contacts }: PoliciesTableProps) {
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input placeholder="Search policies..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-10" />
         </div>
-        <Button onClick={() => setCreateOpen(true)} className="bg-gradient-to-r from-[#92FE9D] to-[#00C9FF] text-black font-semibold hover:opacity-90">
-          <Plus className="mr-2 h-4 w-4" />
-          Add Policy
-        </Button>
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() =>
+              downloadCSV(
+                policies.map((p) => ({
+                  policy_number: p.policy_number,
+                  contact: p.contacts ? `${p.contacts.first_name} ${p.contacts.last_name}` : "",
+                  type: p.type,
+                  status: p.status,
+                  premium: p.premium,
+                  start_date: p.start_date,
+                  end_date: p.end_date,
+                })),
+                "policies"
+              )
+            }
+            title="Export CSV"
+          >
+            <Download className="h-4 w-4" />
+          </Button>
+          <Button onClick={() => setCreateOpen(true)} className="bg-gradient-to-r from-[#92FE9D] to-[#00C9FF] text-black font-semibold hover:opacity-90">
+            <Plus className="mr-2 h-4 w-4" />
+            Add Policy
+          </Button>
+        </div>
       </div>
 
       <div className="rounded-lg border border-border/50 bg-card/80 backdrop-blur-sm">

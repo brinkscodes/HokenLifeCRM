@@ -25,9 +25,10 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { MoreHorizontal, Pencil, Trash2, Search, Plus, Mail, Phone } from "lucide-react";
+import { MoreHorizontal, Pencil, Trash2, Search, Plus, Mail, Phone, Download } from "lucide-react";
 import { ContactForm } from "./contact-form";
 import { deleteContact } from "./actions";
+import { downloadCSV } from "@/lib/csv";
 import type { Contact } from "@/types/database";
 
 interface ContactsTableProps {
@@ -69,13 +70,35 @@ export function ContactsTable({ contacts }: ContactsTableProps) {
             className="pl-10"
           />
         </div>
-        <Button
-          onClick={() => setCreateOpen(true)}
-          className="bg-gradient-to-r from-[#92FE9D] to-[#00C9FF] text-black font-semibold hover:opacity-90"
-        >
-          <Plus className="mr-2 h-4 w-4" />
-          Add Contact
-        </Button>
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() =>
+              downloadCSV(
+                contacts.map((c) => ({
+                  first_name: c.first_name,
+                  last_name: c.last_name,
+                  email: c.email,
+                  phone: c.phone,
+                  type: c.type,
+                  created_at: new Date(c.created_at).toLocaleDateString(),
+                })),
+                "contacts"
+              )
+            }
+            title="Export CSV"
+          >
+            <Download className="h-4 w-4" />
+          </Button>
+          <Button
+            onClick={() => setCreateOpen(true)}
+            className="bg-gradient-to-r from-[#92FE9D] to-[#00C9FF] text-black font-semibold hover:opacity-90"
+          >
+            <Plus className="mr-2 h-4 w-4" />
+            Add Contact
+          </Button>
+        </div>
       </div>
 
       {/* Table */}

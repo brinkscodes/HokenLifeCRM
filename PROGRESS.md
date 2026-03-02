@@ -74,9 +74,67 @@
 - User has NOT yet: connected Vercel, set up Stripe keys, configured Google OAuth
 - Dev server was running on `http://localhost:3001`
 
+---
+
+## Session 4 — 2026-03-02
+
+**Focus**: Phase 2 completion + Phase 4 + Phase 5
+
+### Completed — Phase 2 (finishing)
+- Dedicated `/pricing` page with 3-tier cards, feature lists, FAQ section
+- Password reset flow: `/forgot-password` (sends email) + `/update-password` (sets new password)
+- Added "Forgot password?" link to login page
+- Stripe checkout API route `/api/checkout` — creates checkout sessions for authenticated users
+- Updated landing page nav to link to dedicated pricing page
+
+### Completed — Phase 4
+- Activity timeline: dedicated `/dashboard/activities` page
+  - Log calls, emails, meetings, notes, tasks
+  - Link activities to contacts
+  - Timeline UI with type icons and timestamps
+- Renewals tracking: dedicated `/dashboard/renewals` page
+  - Summary cards (expired, due within 30 days, total active)
+  - Filter by urgency: expired, 7 days, 30 days, 90 days
+  - Search by policy number or contact name
+  - Urgency badges (color-coded by days remaining)
+- Updated dashboard "Upcoming Renewals" to link to new renewals page
+- Added Activities + Renewals to sidebar navigation
+
+### Completed — Phase 5 (mostly)
+- Settings page: profile (name), organization (name), billing (current plan, upgrade buttons)
+  - Upgrade buttons call `/api/checkout` for Stripe checkout
+- Global search: Cmd+K command palette
+  - Searches across contacts, policies, claims, leads
+  - Results grouped by type with icons
+  - Debounced server-side search via Supabase
+  - Wired to header search bar
+- Dashboard analytics charts (installed recharts)
+  - Policies by type — donut chart
+  - Leads by status — bar chart
+- Seed data: `supabase/seed.sql`
+  - 20 contacts, 30 policies, 10 claims, 15 leads, 25 activities
+  - Uses subqueries to link records; user replaces ORG_ID_HERE + USER_ID_HERE
+- CSV export: download button on all 4 data tables (contacts, policies, claims, leads)
+  - Shared `src/lib/csv.ts` utility with `downloadCSV` and `parseCSV`
+
+### Build Status
+- All routes compile cleanly with `npm run build`
+- 18 routes total (8 static, 10 dynamic)
+
+### Git State
+- Branch: `main`
+- Working tree: uncommitted changes from Session 4
+- Not yet pushed
+
+### Where We Left Off
+- Phases 1–4 fully complete
+- Phase 5 mostly complete (missing: RBAC, email notifications, testing suite)
+- User has NOT yet: connected Vercel, set up Stripe keys, configured Google OAuth
+- Seed data ready but not yet applied
+
 ### Recommended Next Action
-- Settings page (org/profile management)
-- Wire Stripe checkout flow (sign-up → trial → pay)
-- Activity timeline per contact
-- Seed data for testing
-- Or: user testing + feedback on what's built
+- Push Session 4 changes to GitHub
+- Run seed data against Supabase (after signing up a test user)
+- Set up Stripe keys to test checkout flow
+- Connect Vercel for deployment
+- Or: RBAC / email notifications / testing

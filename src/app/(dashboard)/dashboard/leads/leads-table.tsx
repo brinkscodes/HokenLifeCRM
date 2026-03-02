@@ -8,9 +8,10 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { MoreHorizontal, Pencil, Trash2, Search, Plus } from "lucide-react";
+import { MoreHorizontal, Pencil, Trash2, Search, Plus, Download } from "lucide-react";
 import { LeadForm } from "./lead-form";
 import { deleteLead } from "./actions";
+import { downloadCSV } from "@/lib/csv";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type LeadWithRelations = any;
@@ -56,9 +57,31 @@ export function LeadsTable({ leads, contacts, agents }: LeadsTableProps) {
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input placeholder="Search leads..." value={search} onChange={(e) => setSearch(e.target.value)} className="pl-10" />
         </div>
-        <Button onClick={() => setCreateOpen(true)} className="bg-gradient-to-r from-[#92FE9D] to-[#00C9FF] text-black font-semibold hover:opacity-90">
-          <Plus className="mr-2 h-4 w-4" />Add Lead
-        </Button>
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() =>
+              downloadCSV(
+                leads.map((l) => ({
+                  contact: l.contacts ? `${l.contacts.first_name} ${l.contacts.last_name}` : "",
+                  source: l.source,
+                  status: l.status,
+                  assigned_to: l.profiles?.full_name || "",
+                  value: l.value,
+                  created_at: new Date(l.created_at).toLocaleDateString(),
+                })),
+                "leads"
+              )
+            }
+            title="Export CSV"
+          >
+            <Download className="h-4 w-4" />
+          </Button>
+          <Button onClick={() => setCreateOpen(true)} className="bg-gradient-to-r from-[#92FE9D] to-[#00C9FF] text-black font-semibold hover:opacity-90">
+            <Plus className="mr-2 h-4 w-4" />Add Lead
+          </Button>
+        </div>
       </div>
 
       <div className="rounded-lg border border-border/50 bg-card/80 backdrop-blur-sm">
