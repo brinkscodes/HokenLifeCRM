@@ -8,6 +8,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { updateProfile, updateOrganization } from "./actions";
 import { User, Building2, CreditCard } from "lucide-react";
+import type { UserRole } from "@/types/database";
+import { canManageOrg } from "@/lib/permissions";
 
 interface SettingsFormsProps {
   profile: {
@@ -25,6 +27,9 @@ export function SettingsForms({ profile, email }: SettingsFormsProps) {
   const [profileSaved, setProfileSaved] = useState(false);
   const [orgLoading, setOrgLoading] = useState(false);
   const [orgSaved, setOrgSaved] = useState(false);
+
+  const role = profile.role as UserRole;
+  const isManager = canManageOrg(role);
 
   const org = Array.isArray(profile.organizations)
     ? profile.organizations[0]
@@ -70,7 +75,7 @@ export function SettingsForms({ profile, email }: SettingsFormsProps) {
 
   return (
     <div className="space-y-6">
-      {/* Profile */}
+      {/* Profile — all roles can edit their own name */}
       <Card className="border-border/50 bg-card/80 backdrop-blur-sm">
         <CardHeader>
           <div className="flex items-center gap-2">
@@ -122,96 +127,100 @@ export function SettingsForms({ profile, email }: SettingsFormsProps) {
         </CardContent>
       </Card>
 
-      {/* Organization */}
-      <Card className="border-border/50 bg-card/80 backdrop-blur-sm">
-        <CardHeader>
-          <div className="flex items-center gap-2">
-            <Building2 className="h-5 w-5 text-muted-foreground" />
-            <CardTitle>Organization</CardTitle>
-          </div>
-          <CardDescription>Manage your agency settings.</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleOrgSubmit} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="org_name">Organization name</Label>
-              <Input
-                id="org_name"
-                name="org_name"
-                defaultValue={org?.name || ""}
-                required
-              />
+      {/* Organization — admin/owner only */}
+      {isManager && (
+        <Card className="border-border/50 bg-card/80 backdrop-blur-sm">
+          <CardHeader>
+            <div className="flex items-center gap-2">
+              <Building2 className="h-5 w-5 text-muted-foreground" />
+              <CardTitle>Organization</CardTitle>
             </div>
+            <CardDescription>Manage your agency settings.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleOrgSubmit} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="org_name">Organization name</Label>
+                <Input
+                  id="org_name"
+                  name="org_name"
+                  defaultValue={org?.name || ""}
+                  required
+                />
+              </div>
+              <div className="flex items-center gap-3">
+                <Button type="submit" disabled={orgLoading}>
+                  {orgLoading ? "Saving..." : "Save changes"}
+                </Button>
+                {orgSaved && (
+                  <span className="text-sm text-primary">Saved!</span>
+                )}
+              </div>
+            </form>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Billing — admin/owner only */}
+      {isManager && (
+        <Card className="border-border/50 bg-card/80 backdrop-blur-sm">
+          <CardHeader>
+            <div className="flex items-center gap-2">
+              <CreditCard className="h-5 w-5 text-muted-foreground" />
+              <CardTitle>Billing</CardTitle>
+            </div>
+            <CardDescription>Manage your subscription plan.</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
             <div className="flex items-center gap-3">
-              <Button type="submit" disabled={orgLoading}>
-                {orgLoading ? "Saving..." : "Save changes"}
-              </Button>
-              {orgSaved && (
-                <span className="text-sm text-primary">Saved!</span>
+              <span className="text-sm text-muted-foreground">Current plan:</span>
+              <Badge
+                className={
+                  planLabel === "free"
+                    ? ""
+                    : "bg-gradient-to-r from-[#92FE9D] to-[#00C9FF] text-black"
+                }
+                variant={planLabel === "free" ? "secondary" : "default"}
+              >
+                {planLabel.charAt(0).toUpperCase() + planLabel.slice(1)}
+              </Badge>
+              {trialActive && (
+                <span className="text-xs text-muted-foreground">
+                  Trial ends {trialEnds.toLocaleDateString()}
+                </span>
               )}
             </div>
-          </form>
-        </CardContent>
-      </Card>
 
-      {/* Billing */}
-      <Card className="border-border/50 bg-card/80 backdrop-blur-sm">
-        <CardHeader>
-          <div className="flex items-center gap-2">
-            <CreditCard className="h-5 w-5 text-muted-foreground" />
-            <CardTitle>Billing</CardTitle>
-          </div>
-          <CardDescription>Manage your subscription plan.</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex items-center gap-3">
-            <span className="text-sm text-muted-foreground">Current plan:</span>
-            <Badge
-              className={
-                planLabel === "free"
-                  ? ""
-                  : "bg-gradient-to-r from-[#92FE9D] to-[#00C9FF] text-black"
-              }
-              variant={planLabel === "free" ? "secondary" : "default"}
-            >
-              {planLabel.charAt(0).toUpperCase() + planLabel.slice(1)}
-            </Badge>
-            {trialActive && (
-              <span className="text-xs text-muted-foreground">
-                Trial ends {trialEnds.toLocaleDateString()}
-              </span>
-            )}
-          </div>
-
-          {(planLabel === "free" || planLabel === "starter") && (
-            <div className="rounded-lg border border-border/50 bg-muted/30 p-4">
-              <p className="mb-3 text-sm text-muted-foreground">
-                {planLabel === "free"
-                  ? "Upgrade to unlock all features."
-                  : "Upgrade to Professional for unlimited contacts and team collaboration."}
-              </p>
-              <div className="flex gap-2">
-                {planLabel === "free" && (
+            {(planLabel === "free" || planLabel === "starter") && (
+              <div className="rounded-lg border border-border/50 bg-muted/30 p-4">
+                <p className="mb-3 text-sm text-muted-foreground">
+                  {planLabel === "free"
+                    ? "Upgrade to unlock all features."
+                    : "Upgrade to Professional for unlimited contacts and team collaboration."}
+                </p>
+                <div className="flex gap-2">
+                  {planLabel === "free" && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleUpgrade("starter")}
+                    >
+                      Starter — $29/mo
+                    </Button>
+                  )}
                   <Button
-                    variant="outline"
                     size="sm"
-                    onClick={() => handleUpgrade("starter")}
+                    className="bg-gradient-to-r from-[#92FE9D] to-[#00C9FF] text-black font-semibold hover:opacity-90"
+                    onClick={() => handleUpgrade("professional")}
                   >
-                    Starter — $29/mo
+                    Professional — $79/mo
                   </Button>
-                )}
-                <Button
-                  size="sm"
-                  className="bg-gradient-to-r from-[#92FE9D] to-[#00C9FF] text-black font-semibold hover:opacity-90"
-                  onClick={() => handleUpgrade("professional")}
-                >
-                  Professional — $79/mo
-                </Button>
+                </div>
               </div>
-            </div>
-          )}
-        </CardContent>
-      </Card>
+            )}
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }

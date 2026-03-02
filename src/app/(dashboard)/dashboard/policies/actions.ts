@@ -2,6 +2,8 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { getAuthProfile } from "@/lib/auth";
+import { canEditData } from "@/lib/permissions";
 
 export async function getPolicies() {
   const supabase = await createClient();
@@ -26,19 +28,10 @@ export async function getContactsForSelect() {
 }
 
 export async function createPolicy(formData: FormData) {
+  const profile = await getAuthProfile();
+  if (!canEditData(profile.role)) throw new Error("Permission denied");
+
   const supabase = await createClient();
-
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) throw new Error("Not authenticated");
-
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("org_id")
-    .eq("id", user.id)
-    .single();
-
-  if (!profile) throw new Error("Profile not found");
-
   const { error } = await supabase.from("policies").insert({
     policy_number: formData.get("policy_number") as string,
     contact_id: formData.get("contact_id") as string,
@@ -47,7 +40,7 @@ export async function createPolicy(formData: FormData) {
     premium: parseFloat(formData.get("premium") as string) || 0,
     start_date: formData.get("start_date") as string,
     end_date: formData.get("end_date") as string,
-    org_id: profile.org_id,
+    org_id: profile.orgId,
   });
 
   if (error) throw error;
@@ -55,8 +48,10 @@ export async function createPolicy(formData: FormData) {
 }
 
 export async function updatePolicy(id: string, formData: FormData) {
-  const supabase = await createClient();
+  const profile = await getAuthProfile();
+  if (!canEditData(profile.role)) throw new Error("Permission denied");
 
+  const supabase = await createClient();
   const { error } = await supabase
     .from("policies")
     .update({
@@ -75,6 +70,9 @@ export async function updatePolicy(id: string, formData: FormData) {
 }
 
 export async function deletePolicy(id: string) {
+  const profile = await getAuthProfile();
+  if (!canEditData(profile.role)) throw new Error("Permission denied");
+
   const supabase = await createClient();
   const { error } = await supabase.from("policies").delete().eq("id", id);
 

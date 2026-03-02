@@ -2,6 +2,8 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { getAuthProfile } from "@/lib/auth";
+import { canEditData } from "@/lib/permissions";
 
 export async function getContacts() {
   const supabase = await createClient();
@@ -27,19 +29,10 @@ export async function getContact(id: string) {
 }
 
 export async function createContact(formData: FormData) {
+  const profile = await getAuthProfile();
+  if (!canEditData(profile.role)) throw new Error("Permission denied");
+
   const supabase = await createClient();
-
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) throw new Error("Not authenticated");
-
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("org_id")
-    .eq("id", user.id)
-    .single();
-
-  if (!profile) throw new Error("Profile not found");
-
   const { error } = await supabase.from("contacts").insert({
     first_name: formData.get("first_name") as string,
     last_name: formData.get("last_name") as string,
@@ -47,8 +40,8 @@ export async function createContact(formData: FormData) {
     phone: (formData.get("phone") as string) || null,
     type: (formData.get("type") as string) || "individual",
     notes: (formData.get("notes") as string) || null,
-    org_id: profile.org_id,
-    created_by: user.id,
+    org_id: profile.orgId,
+    created_by: profile.id,
   });
 
   if (error) throw error;
@@ -56,8 +49,10 @@ export async function createContact(formData: FormData) {
 }
 
 export async function updateContact(id: string, formData: FormData) {
-  const supabase = await createClient();
+  const profile = await getAuthProfile();
+  if (!canEditData(profile.role)) throw new Error("Permission denied");
 
+  const supabase = await createClient();
   const { error } = await supabase
     .from("contacts")
     .update({
@@ -75,6 +70,9 @@ export async function updateContact(id: string, formData: FormData) {
 }
 
 export async function deleteContact(id: string) {
+  const profile = await getAuthProfile();
+  if (!canEditData(profile.role)) throw new Error("Permission denied");
+
   const supabase = await createClient();
   const { error } = await supabase.from("contacts").delete().eq("id", id);
 

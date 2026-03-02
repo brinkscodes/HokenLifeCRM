@@ -1,6 +1,8 @@
 import { getActivities, getContactsForSelect } from "./actions";
 import { ActivityTimeline } from "./activity-timeline";
 import { ActivityForm } from "./activity-form";
+import { getAuthProfileOrNull } from "@/lib/auth";
+import { canEditData } from "@/lib/permissions";
 
 export default async function ActivitiesPage() {
   let activities: Awaited<ReturnType<typeof getActivities>> = [];
@@ -14,6 +16,9 @@ export default async function ActivitiesPage() {
     // Will be empty on first load or if user has no org yet
   }
 
+  const profile = await getAuthProfileOrNull();
+  const canEdit = profile ? canEditData(profile.role) : false;
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -23,7 +28,7 @@ export default async function ActivitiesPage() {
             Track calls, emails, meetings, and notes.
           </p>
         </div>
-        <ActivityForm contacts={contacts} />
+        {canEdit && <ActivityForm contacts={contacts} />}
       </div>
       <ActivityTimeline activities={activities} />
     </div>

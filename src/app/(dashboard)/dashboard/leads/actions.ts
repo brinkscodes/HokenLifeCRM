@@ -2,6 +2,8 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { getAuthProfile } from "@/lib/auth";
+import { canEditData } from "@/lib/permissions";
 
 export async function getLeads() {
   const supabase = await createClient();
@@ -37,19 +39,10 @@ export async function getAgentsForAssignment() {
 }
 
 export async function createLead(formData: FormData) {
+  const profile = await getAuthProfile();
+  if (!canEditData(profile.role)) throw new Error("Permission denied");
+
   const supabase = await createClient();
-
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) throw new Error("Not authenticated");
-
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("org_id")
-    .eq("id", user.id)
-    .single();
-
-  if (!profile) throw new Error("Profile not found");
-
   const assignedTo = formData.get("assigned_to") as string;
 
   const { error } = await supabase.from("leads").insert({
@@ -58,7 +51,7 @@ export async function createLead(formData: FormData) {
     status: (formData.get("status") as string) || "new",
     assigned_to: assignedTo || null,
     value: parseFloat(formData.get("value") as string) || null,
-    org_id: profile.org_id,
+    org_id: profile.orgId,
   });
 
   if (error) throw error;
@@ -66,6 +59,9 @@ export async function createLead(formData: FormData) {
 }
 
 export async function updateLead(id: string, formData: FormData) {
+  const profile = await getAuthProfile();
+  if (!canEditData(profile.role)) throw new Error("Permission denied");
+
   const supabase = await createClient();
   const assignedTo = formData.get("assigned_to") as string;
 
@@ -85,6 +81,9 @@ export async function updateLead(id: string, formData: FormData) {
 }
 
 export async function deleteLead(id: string) {
+  const profile = await getAuthProfile();
+  if (!canEditData(profile.role)) throw new Error("Permission denied");
+
   const supabase = await createClient();
   const { error } = await supabase.from("leads").delete().eq("id", id);
 

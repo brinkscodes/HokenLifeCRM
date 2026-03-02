@@ -11,6 +11,7 @@ import {
   Activity,
   CalendarClock,
   Settings,
+  UsersRound,
   LogOut,
   ChevronLeft,
   ChevronRight,
@@ -22,22 +23,32 @@ import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { LogoWithText, Logo } from "@/components/layout/logo";
 import { cn } from "@/lib/utils";
+import type { UserRole } from "@/types/database";
+import { getVisibleNavItems } from "@/lib/permissions";
 
-const navItems = [
-  { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-  { label: "Contacts", href: "/dashboard/contacts", icon: Users },
-  { label: "Policies", href: "/dashboard/policies", icon: FileText },
-  { label: "Claims", href: "/dashboard/claims", icon: ShieldAlert },
-  { label: "Leads", href: "/dashboard/leads", icon: Target },
-  { label: "Activities", href: "/dashboard/activities", icon: Activity },
-  { label: "Renewals", href: "/dashboard/renewals", icon: CalendarClock },
-  { label: "Settings", href: "/dashboard/settings", icon: Settings },
+const allNavItems = [
+  { key: "dashboard", label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+  { key: "contacts", label: "Contacts", href: "/dashboard/contacts", icon: Users },
+  { key: "policies", label: "Policies", href: "/dashboard/policies", icon: FileText },
+  { key: "claims", label: "Claims", href: "/dashboard/claims", icon: ShieldAlert },
+  { key: "leads", label: "Leads", href: "/dashboard/leads", icon: Target },
+  { key: "activities", label: "Activities", href: "/dashboard/activities", icon: Activity },
+  { key: "renewals", label: "Renewals", href: "/dashboard/renewals", icon: CalendarClock },
+  { key: "team", label: "Team", href: "/dashboard/team", icon: UsersRound },
+  { key: "settings", label: "Settings", href: "/dashboard/settings", icon: Settings },
 ];
 
-export function Sidebar() {
+interface SidebarProps {
+  userRole?: UserRole;
+}
+
+export function Sidebar({ userRole = "viewer" }: SidebarProps) {
   const pathname = usePathname();
   const router = useRouter();
   const [collapsed, setCollapsed] = useState(false);
+
+  const visibleKeys = getVisibleNavItems(userRole);
+  const navItems = allNavItems.filter((item) => visibleKeys.includes(item.key));
 
   async function handleLogout() {
     const supabase = createClient();

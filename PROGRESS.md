@@ -123,18 +123,76 @@
 
 ### Git State
 - Branch: `main`
-- Working tree: uncommitted changes from Session 4
-- Not yet pushed
+- Latest commit: `17c57ee` — Session 4 complete
+- 1 commit ahead of `origin/main` (not yet pushed)
 
 ### Where We Left Off
 - Phases 1–4 fully complete
 - Phase 5 mostly complete (missing: RBAC, email notifications, testing suite)
 - User has NOT yet: connected Vercel, set up Stripe keys, configured Google OAuth
 - Seed data ready but not yet applied
+- `Project Details/` folder exists in repo root (untracked, external docs)
 
 ### Recommended Next Action
-- Push Session 4 changes to GitHub
+- Push to GitHub (`git push`)
 - Run seed data against Supabase (after signing up a test user)
 - Set up Stripe keys to test checkout flow
 - Connect Vercel for deployment
 - Or: RBAC / email notifications / testing
+
+---
+
+## Session 5 — 2026-03-02
+
+**Focus**: RBAC (Role-Based Access Control)
+
+### Completed
+- Pushed Session 4 commit to GitHub (`17c57ee`)
+- **Permissions utility** (`src/lib/permissions.ts`)
+  - Role hierarchy: viewer < agent < admin < owner
+  - Permission checks: `canEditData`, `canManageOrg`, `canManageTeam`, `canChangeRole`, `canRemoveMember`
+  - Sidebar visibility filter: `getVisibleNavItems`
+- **Auth helper** (`src/lib/auth.ts`)
+  - `getAuthProfile()` — returns authenticated user's id, name, email, role, orgId
+  - `getAuthProfileOrNull()` — safe version for layouts
+- **Server action role checks** — all 6 modules updated:
+  - Contacts: create/update/delete require `agent+`
+  - Policies: create/update/delete require `agent+`
+  - Claims: create/update/delete require `agent+`
+  - Leads: create/update/delete require `agent+`
+  - Activities: create requires `agent+`
+  - Settings: updateOrganization requires `admin+`
+- **Middleware role-based routing** — `/dashboard/team` and `/dashboard/settings` blocked for viewer/agent roles
+- **Dashboard layout** — fetches profile, passes `userRole` to sidebar and header
+- **Sidebar** — conditionally shows Team and Settings nav items for admin/owner only
+- **Header** — displays role badge next to avatar
+- **Settings page** — Organization and Billing cards hidden for non-admins
+- **All data tables** — create/edit/delete buttons hidden for viewers (contacts, policies, claims, leads)
+- **Activities page** — "Log Activity" button hidden for viewers
+- **Team management page** (`/dashboard/team`) — new route with:
+  - Summary cards (total members, agents, admins)
+  - Member table with role display and management
+  - Role change dropdown (for non-owner members)
+  - Remove member button
+  - Invite member dialog (email + role selection)
+
+### Build Status
+- All routes compile cleanly with `npm run build`
+- 19 routes total (8 static, 11 dynamic — added `/dashboard/team`)
+
+### Git State
+- Branch: `main`
+- Latest commit: pending (RBAC feature)
+
+### Where We Left Off
+- Phases 1–5 fully complete (RBAC done)
+- Remaining features: email notifications, testing suite, CSV import
+- User has NOT yet: connected Vercel, set up Stripe keys, configured Google OAuth
+- Seed data ready but not yet applied
+
+### Recommended Next Action
+- Commit and push RBAC to GitHub
+- Sign up a test user and apply seed data
+- Set up Stripe keys to test checkout flow
+- Connect Vercel for deployment
+- Or: email notifications / testing suite

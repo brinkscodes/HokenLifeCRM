@@ -2,6 +2,8 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { getAuthProfile } from "@/lib/auth";
+import { canEditData } from "@/lib/permissions";
 
 export async function getClaims() {
   const supabase = await createClient();
@@ -26,19 +28,10 @@ export async function getPoliciesForSelect() {
 }
 
 export async function createClaim(formData: FormData) {
+  const profile = await getAuthProfile();
+  if (!canEditData(profile.role)) throw new Error("Permission denied");
+
   const supabase = await createClient();
-
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) throw new Error("Not authenticated");
-
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("org_id")
-    .eq("id", user.id)
-    .single();
-
-  if (!profile) throw new Error("Profile not found");
-
   const { error } = await supabase.from("claims").insert({
     claim_number: formData.get("claim_number") as string,
     policy_id: formData.get("policy_id") as string,
@@ -46,7 +39,7 @@ export async function createClaim(formData: FormData) {
     amount: parseFloat(formData.get("amount") as string) || 0,
     description: (formData.get("description") as string) || null,
     filed_date: formData.get("filed_date") as string,
-    org_id: profile.org_id,
+    org_id: profile.orgId,
   });
 
   if (error) throw error;
@@ -54,8 +47,10 @@ export async function createClaim(formData: FormData) {
 }
 
 export async function updateClaim(id: string, formData: FormData) {
-  const supabase = await createClient();
+  const profile = await getAuthProfile();
+  if (!canEditData(profile.role)) throw new Error("Permission denied");
 
+  const supabase = await createClient();
   const { error } = await supabase
     .from("claims")
     .update({
@@ -73,6 +68,9 @@ export async function updateClaim(id: string, formData: FormData) {
 }
 
 export async function deleteClaim(id: string) {
+  const profile = await getAuthProfile();
+  if (!canEditData(profile.role)) throw new Error("Permission denied");
+
   const supabase = await createClient();
   const { error } = await supabase.from("claims").delete().eq("id", id);
 

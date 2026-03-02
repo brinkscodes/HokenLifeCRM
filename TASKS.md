@@ -7,7 +7,6 @@
 ## Next Up
 
 ### Remaining Features
-- [ ] Role-based access control (admin, agent, viewer)
 - [ ] Email notifications
 - [ ] Testing suite
 - [ ] CSV import (upload + preview + validate)
@@ -54,3 +53,4 @@
 - [x] Dashboard analytics — policies by type chart, leads by status chart (2026-03-02)
 - [x] Seed data — 20 contacts, 30 policies, 10 claims, 15 leads, 25 activities (2026-03-02)
 - [x] CSV export — download buttons on contacts, policies, claims, leads tables (2026-03-02)
+- [x] RBAC — permissions utility, role checks in all server actions, role-based sidebar/settings/middleware, team management page (2026-03-02)

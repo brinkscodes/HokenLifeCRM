@@ -22,6 +22,7 @@ interface PoliciesTableProps {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   policies: PolicyWithContact[];
   contacts: { id: string; first_name: string; last_name: string }[];
+  canEdit?: boolean;
 }
 
 const statusColors: Record<string, string> = {
@@ -31,7 +32,7 @@ const statusColors: Record<string, string> = {
   cancelled: "bg-gray-500/10 text-gray-500 border-gray-500/20",
 };
 
-export function PoliciesTable({ policies, contacts }: PoliciesTableProps) {
+export function PoliciesTable({ policies, contacts, canEdit = false }: PoliciesTableProps) {
   const [search, setSearch] = useState("");
   const [editPolicy, setEditPolicy] = useState<PolicyWithContact | null>(null);
   const [createOpen, setCreateOpen] = useState(false);
@@ -84,10 +85,12 @@ export function PoliciesTable({ policies, contacts }: PoliciesTableProps) {
           >
             <Download className="h-4 w-4" />
           </Button>
-          <Button onClick={() => setCreateOpen(true)} className="bg-gradient-to-r from-[#92FE9D] to-[#00C9FF] text-black font-semibold hover:opacity-90">
-            <Plus className="mr-2 h-4 w-4" />
-            Add Policy
-          </Button>
+          {canEdit && (
+            <Button onClick={() => setCreateOpen(true)} className="bg-gradient-to-r from-[#92FE9D] to-[#00C9FF] text-black font-semibold hover:opacity-90">
+              <Plus className="mr-2 h-4 w-4" />
+              Add Policy
+            </Button>
+          )}
         </div>
       </div>
 
@@ -101,13 +104,13 @@ export function PoliciesTable({ policies, contacts }: PoliciesTableProps) {
               <TableHead>Status</TableHead>
               <TableHead>Premium</TableHead>
               <TableHead>End Date</TableHead>
-              <TableHead className="w-[50px]" />
+              {canEdit && <TableHead className="w-[50px]" />}
             </TableRow>
           </TableHeader>
           <TableBody>
             {filtered.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
+                <TableCell colSpan={canEdit ? 7 : 6} className="text-center py-8 text-muted-foreground">
                   {policies.length === 0
                     ? "No policies yet. Add contacts first, then create policies."
                     : "No policies match your search."}
@@ -132,23 +135,25 @@ export function PoliciesTable({ policies, contacts }: PoliciesTableProps) {
                   <TableCell className="text-sm text-muted-foreground">
                     {new Date(policy.end_date).toLocaleDateString()}
                   </TableCell>
-                  <TableCell>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon" className="h-8 w-8">
-                          <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => setEditPolicy(policy)}>
-                          <Pencil className="mr-2 h-4 w-4" />Edit
-                        </DropdownMenuItem>
-                        <DropdownMenuItem className="text-destructive" onClick={() => handleDelete(policy.id)}>
-                          <Trash2 className="mr-2 h-4 w-4" />Delete
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </TableCell>
+                  {canEdit && (
+                    <TableCell>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="icon" className="h-8 w-8">
+                            <MoreHorizontal className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem onClick={() => setEditPolicy(policy)}>
+                            <Pencil className="mr-2 h-4 w-4" />Edit
+                          </DropdownMenuItem>
+                          <DropdownMenuItem className="text-destructive" onClick={() => handleDelete(policy.id)}>
+                            <Trash2 className="mr-2 h-4 w-4" />Delete
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  )}
                 </TableRow>
               ))
             )}

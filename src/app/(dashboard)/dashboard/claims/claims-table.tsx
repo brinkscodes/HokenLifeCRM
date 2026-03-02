@@ -21,6 +21,7 @@ interface ClaimsTableProps {
   claims: ClaimWithPolicy[];
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   policies: any[];
+  canEdit?: boolean;
 }
 
 const statusColors: Record<string, string> = {
@@ -31,7 +32,7 @@ const statusColors: Record<string, string> = {
   closed: "bg-gray-500/10 text-gray-500 border-gray-500/20",
 };
 
-export function ClaimsTable({ claims, policies }: ClaimsTableProps) {
+export function ClaimsTable({ claims, policies, canEdit = false }: ClaimsTableProps) {
   const [search, setSearch] = useState("");
   const [editClaim, setEditClaim] = useState<ClaimWithPolicy | null>(null);
   const [createOpen, setCreateOpen] = useState(false);
@@ -80,10 +81,12 @@ export function ClaimsTable({ claims, policies }: ClaimsTableProps) {
           >
             <Download className="h-4 w-4" />
           </Button>
-          <Button onClick={() => setCreateOpen(true)} className="bg-gradient-to-r from-[#92FE9D] to-[#00C9FF] text-black font-semibold hover:opacity-90">
-            <Plus className="mr-2 h-4 w-4" />
-            File Claim
-          </Button>
+          {canEdit && (
+            <Button onClick={() => setCreateOpen(true)} className="bg-gradient-to-r from-[#92FE9D] to-[#00C9FF] text-black font-semibold hover:opacity-90">
+              <Plus className="mr-2 h-4 w-4" />
+              File Claim
+            </Button>
+          )}
         </div>
       </div>
 
@@ -97,13 +100,13 @@ export function ClaimsTable({ claims, policies }: ClaimsTableProps) {
               <TableHead>Status</TableHead>
               <TableHead>Amount</TableHead>
               <TableHead>Filed</TableHead>
-              <TableHead className="w-[50px]" />
+              {canEdit && <TableHead className="w-[50px]" />}
             </TableRow>
           </TableHeader>
           <TableBody>
             {filtered.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
+                <TableCell colSpan={canEdit ? 7 : 6} className="text-center py-8 text-muted-foreground">
                   {claims.length === 0 ? "No claims yet." : "No claims match your search."}
                 </TableCell>
               </TableRow>
@@ -126,21 +129,23 @@ export function ClaimsTable({ claims, policies }: ClaimsTableProps) {
                   <TableCell className="text-sm text-muted-foreground">
                     {new Date(claim.filed_date).toLocaleDateString()}
                   </TableCell>
-                  <TableCell>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon" className="h-8 w-8"><MoreHorizontal className="h-4 w-4" /></Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => setEditClaim(claim)}>
-                          <Pencil className="mr-2 h-4 w-4" />Edit
-                        </DropdownMenuItem>
-                        <DropdownMenuItem className="text-destructive" onClick={() => handleDelete(claim.id)}>
-                          <Trash2 className="mr-2 h-4 w-4" />Delete
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </TableCell>
+                  {canEdit && (
+                    <TableCell>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="icon" className="h-8 w-8"><MoreHorizontal className="h-4 w-4" /></Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem onClick={() => setEditClaim(claim)}>
+                            <Pencil className="mr-2 h-4 w-4" />Edit
+                          </DropdownMenuItem>
+                          <DropdownMenuItem className="text-destructive" onClick={() => handleDelete(claim.id)}>
+                            <Trash2 className="mr-2 h-4 w-4" />Delete
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  )}
                 </TableRow>
               ))
             )}

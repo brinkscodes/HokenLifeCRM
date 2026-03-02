@@ -2,6 +2,8 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { getAuthProfile } from "@/lib/auth";
+import { canEditData } from "@/lib/permissions";
 
 export async function getActivities(contactId?: string) {
   const supabase = await createClient();
@@ -20,29 +22,18 @@ export async function getActivities(contactId?: string) {
 }
 
 export async function createActivity(formData: FormData) {
+  const profile = await getAuthProfile();
+  if (!canEditData(profile.role)) throw new Error("Permission denied");
+
   const supabase = await createClient();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) throw new Error("Not authenticated");
-
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("org_id")
-    .eq("id", user.id)
-    .single();
-
-  if (!profile) throw new Error("Profile not found");
-
   const contactId = formData.get("contact_id") as string;
 
   const { error } = await supabase.from("activities").insert({
     type: formData.get("type") as string,
     description: formData.get("description") as string,
     contact_id: contactId || null,
-    user_id: user.id,
-    org_id: profile.org_id,
+    user_id: profile.id,
+    org_id: profile.orgId,
   });
 
   if (error) throw error;

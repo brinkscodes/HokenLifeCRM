@@ -21,6 +21,7 @@ interface LeadsTableProps {
   leads: LeadWithRelations[];
   contacts: { id: string; first_name: string; last_name: string }[];
   agents: { id: string; full_name: string }[];
+  canEdit?: boolean;
 }
 
 const statusColors: Record<string, string> = {
@@ -32,7 +33,7 @@ const statusColors: Record<string, string> = {
   lost: "bg-red-500/10 text-red-500 border-red-500/20",
 };
 
-export function LeadsTable({ leads, contacts, agents }: LeadsTableProps) {
+export function LeadsTable({ leads, contacts, agents, canEdit = false }: LeadsTableProps) {
   const [search, setSearch] = useState("");
   const [editLead, setEditLead] = useState<LeadWithRelations | null>(null);
   const [createOpen, setCreateOpen] = useState(false);
@@ -78,9 +79,11 @@ export function LeadsTable({ leads, contacts, agents }: LeadsTableProps) {
           >
             <Download className="h-4 w-4" />
           </Button>
-          <Button onClick={() => setCreateOpen(true)} className="bg-gradient-to-r from-[#92FE9D] to-[#00C9FF] text-black font-semibold hover:opacity-90">
-            <Plus className="mr-2 h-4 w-4" />Add Lead
-          </Button>
+          {canEdit && (
+            <Button onClick={() => setCreateOpen(true)} className="bg-gradient-to-r from-[#92FE9D] to-[#00C9FF] text-black font-semibold hover:opacity-90">
+              <Plus className="mr-2 h-4 w-4" />Add Lead
+            </Button>
+          )}
         </div>
       </div>
 
@@ -94,13 +97,13 @@ export function LeadsTable({ leads, contacts, agents }: LeadsTableProps) {
               <TableHead>Assigned To</TableHead>
               <TableHead>Value</TableHead>
               <TableHead>Created</TableHead>
-              <TableHead className="w-[50px]" />
+              {canEdit && <TableHead className="w-[50px]" />}
             </TableRow>
           </TableHeader>
           <TableBody>
             {filtered.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
+                <TableCell colSpan={canEdit ? 7 : 6} className="text-center py-8 text-muted-foreground">
                   {leads.length === 0 ? "No leads yet. Add contacts first, then create leads." : "No leads match your search."}
                 </TableCell>
               </TableRow>
@@ -119,17 +122,19 @@ export function LeadsTable({ leads, contacts, agents }: LeadsTableProps) {
                   <TableCell className="text-sm">{lead.profiles?.full_name ?? <span className="text-muted-foreground">Unassigned</span>}</TableCell>
                   <TableCell>{lead.value ? `$${lead.value.toLocaleString()}` : "—"}</TableCell>
                   <TableCell className="text-sm text-muted-foreground">{new Date(lead.created_at).toLocaleDateString()}</TableCell>
-                  <TableCell>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon" className="h-8 w-8"><MoreHorizontal className="h-4 w-4" /></Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => setEditLead(lead)}><Pencil className="mr-2 h-4 w-4" />Edit</DropdownMenuItem>
-                        <DropdownMenuItem className="text-destructive" onClick={() => handleDelete(lead.id)}><Trash2 className="mr-2 h-4 w-4" />Delete</DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </TableCell>
+                  {canEdit && (
+                    <TableCell>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="icon" className="h-8 w-8"><MoreHorizontal className="h-4 w-4" /></Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem onClick={() => setEditLead(lead)}><Pencil className="mr-2 h-4 w-4" />Edit</DropdownMenuItem>
+                          <DropdownMenuItem className="text-destructive" onClick={() => handleDelete(lead.id)}><Trash2 className="mr-2 h-4 w-4" />Delete</DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  )}
                 </TableRow>
               ))
             )}

@@ -4,14 +4,17 @@ import { Bell, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
 import { SearchCommand } from "./search-command";
 import { useState } from "react";
+import type { UserRole } from "@/types/database";
 
 interface HeaderProps {
   userName?: string;
+  userRole?: UserRole;
 }
 
-export function Header({ userName = "User" }: HeaderProps) {
+export function Header({ userName = "User", userRole }: HeaderProps) {
   const [searchOpen, setSearchOpen] = useState(false);
 
   const initials = userName
@@ -42,11 +45,18 @@ export function Header({ userName = "User" }: HeaderProps) {
           <Button variant="ghost" size="icon" className="relative">
             <Bell className="h-5 w-5" />
           </Button>
-          <Avatar className="h-8 w-8 border border-border/50">
-            <AvatarFallback className="bg-gradient-to-br from-[#92FE9D] to-[#00C9FF] text-xs font-semibold text-black">
-              {initials}
-            </AvatarFallback>
-          </Avatar>
+          <div className="flex items-center gap-2">
+            <Avatar className="h-8 w-8 border border-border/50">
+              <AvatarFallback className="bg-gradient-to-br from-[#92FE9D] to-[#00C9FF] text-xs font-semibold text-black">
+                {initials}
+              </AvatarFallback>
+            </Avatar>
+            {userRole && (
+              <Badge variant="outline" className="hidden text-xs capitalize md:inline-flex">
+                {userRole}
+              </Badge>
+            )}
+          </div>
         </div>
       </header>
       <SearchCommand open={searchOpen} onOpenChange={setSearchOpen} />

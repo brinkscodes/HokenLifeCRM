@@ -33,9 +33,10 @@ import type { Contact } from "@/types/database";
 
 interface ContactsTableProps {
   contacts: Contact[];
+  canEdit?: boolean;
 }
 
-export function ContactsTable({ contacts }: ContactsTableProps) {
+export function ContactsTable({ contacts, canEdit = false }: ContactsTableProps) {
   const [search, setSearch] = useState("");
   const [editContact, setEditContact] = useState<Contact | null>(null);
   const [createOpen, setCreateOpen] = useState(false);
@@ -91,13 +92,15 @@ export function ContactsTable({ contacts }: ContactsTableProps) {
           >
             <Download className="h-4 w-4" />
           </Button>
-          <Button
-            onClick={() => setCreateOpen(true)}
-            className="bg-gradient-to-r from-[#92FE9D] to-[#00C9FF] text-black font-semibold hover:opacity-90"
-          >
-            <Plus className="mr-2 h-4 w-4" />
-            Add Contact
-          </Button>
+          {canEdit && (
+            <Button
+              onClick={() => setCreateOpen(true)}
+              className="bg-gradient-to-r from-[#92FE9D] to-[#00C9FF] text-black font-semibold hover:opacity-90"
+            >
+              <Plus className="mr-2 h-4 w-4" />
+              Add Contact
+            </Button>
+          )}
         </div>
       </div>
 
@@ -111,7 +114,7 @@ export function ContactsTable({ contacts }: ContactsTableProps) {
               <TableHead>Phone</TableHead>
               <TableHead>Type</TableHead>
               <TableHead>Created</TableHead>
-              <TableHead className="w-[50px]" />
+              {canEdit && <TableHead className="w-[50px]" />}
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -157,28 +160,30 @@ export function ContactsTable({ contacts }: ContactsTableProps) {
                   <TableCell className="text-sm text-muted-foreground">
                     {new Date(contact.created_at).toLocaleDateString()}
                   </TableCell>
-                  <TableCell>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon" className="h-8 w-8">
-                          <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => setEditContact(contact)}>
-                          <Pencil className="mr-2 h-4 w-4" />
-                          Edit
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                          className="text-destructive"
-                          onClick={() => handleDelete(contact.id)}
-                        >
-                          <Trash2 className="mr-2 h-4 w-4" />
-                          Delete
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </TableCell>
+                  {canEdit && (
+                    <TableCell>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="icon" className="h-8 w-8">
+                            <MoreHorizontal className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem onClick={() => setEditContact(contact)}>
+                            <Pencil className="mr-2 h-4 w-4" />
+                            Edit
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            className="text-destructive"
+                            onClick={() => handleDelete(contact.id)}
+                          >
+                            <Trash2 className="mr-2 h-4 w-4" />
+                            Delete
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  )}
                 </TableRow>
               ))
             )}
