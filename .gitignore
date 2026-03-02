@@ -1,0 +1,39 @@
+# dependencies
+node_modules/
+/.pnp
+.pnp.*
+.yarn/install-state.gz
+
+# next.js
+/.next/
+/out/
+
+# production
+/build
+
+# env files
+.env
+.env.local
+.env*.local
+
+# misc
+.DS_Store
+*.pem
+*.log
+
+# debug
+npm-debug.log*
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+
+# vercel
+.vercel
+
+# claude
+.claude/
+
+# inspiration (not needed in repo)
+insipiration/
+logo inspiration/
