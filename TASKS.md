@@ -4,55 +4,29 @@
 
 ---
 
-## Phase 1 — Foundation (Current)
+## Next Up
 
-### In Progress
-
-_None yet._
-
-### To Do
-
-- [ ] Scaffold Next.js 15 project with TypeScript + Tailwind CSS 4
-- [ ] Install and configure shadcn/ui
-- [ ] Configure environment variables + Supabase client (browser + server)
-- [ ] Define database schema + run Supabase migrations + RLS policies
-- [ ] Set up Supabase Auth (email/password + Google OAuth)
-- [ ] Set up Stripe integration (subscriptions, webhooks, 14-day trial)
-- [ ] Build dashboard layout (sidebar, header, shell, theme toggle)
-- [ ] Create HokenLife logo (SVG — geometric "H" + wordmark)
-- [ ] Push to GitHub (`brinkscodes/HokenLifeCRM`) + connect Vercel
-
-## Phase 2 — Landing & Auth Flow
-
-- [ ] Build landing page (hero, features, pricing, CTA)
-- [ ] Build pricing page with 3 tiers
-- [ ] Implement sign-up → free trial → Stripe checkout flow
-- [ ] Login / logout / password reset pages
-- [ ] Dark/light mode toggle
-
-## Phase 3 — Core CRM
-
-- [ ] Dashboard home (KPI cards, charts, recent activity)
-- [ ] Contacts CRUD (list, create, view, edit, delete)
-- [ ] Data tables with sorting, filtering, pagination
-- [ ] Global search
-
-## Phase 4 — Insurance Modules
-
-- [ ] Policies management (CRUD + status tracking)
-- [ ] Claims tracking (CRUD + workflow)
-- [ ] Lead pipeline (kanban or list view)
+### Phase 4 — Insurance Modules
 - [ ] Activity timeline per contact
-- [ ] Renewals tracking
+- [ ] Renewals tracking / notifications
 
-## Phase 5 — Polish & Scale
-
-- [ ] Dashboard analytics
+### Phase 5 — Polish & Scale
+- [ ] Settings page (org name, profile, billing)
+- [ ] Dashboard analytics (charts with real data)
 - [ ] Role-based access control (admin, agent, viewer)
 - [ ] Email notifications
 - [ ] Export/import (CSV)
 - [ ] Seed data for development
 - [ ] Testing suite
+- [ ] Global search (across contacts, policies, claims, leads)
+
+### Pending Setup
+- [ ] Connect Vercel to GitHub repo
+- [ ] Set up Stripe keys + webhook endpoint
+- [ ] Configure Google OAuth in Supabase dashboard
+- [ ] Set custom domain on Vercel
+- [ ] Implement sign-up → free trial → Stripe checkout flow
+- [ ] Build dedicated pricing page
 
 ---
 
@@ -63,3 +37,19 @@ _None yet._
 - [x] Define tech stack and architecture (2026-03-02)
 - [x] Gather design inspiration and logo direction (2026-03-02)
 - [x] Update all project docs to reflect final decisions (2026-03-02)
+- [x] Scaffold Next.js project with TypeScript + Tailwind CSS 4 (2026-03-02)
+- [x] Install and configure shadcn/ui — 19 components (2026-03-02)
+- [x] Configure Supabase client (browser + server) + env vars (2026-03-02)
+- [x] Set up Supabase Auth (email/password + Google OAuth ready) (2026-03-02)
+- [x] Define database schema + run migrations + RLS policies (2026-03-02)
+- [x] Set up Stripe webhook handler (2026-03-02)
+- [x] Build dashboard layout — sidebar, header, theme toggle (2026-03-02)
+- [x] Create SVG logo component (abstract geometric H) (2026-03-02)
+- [x] Build landing page — hero, features, pricing, CTA (2026-03-02)
+- [x] Build login + signup pages (2026-03-02)
+- [x] Push to GitHub `brinkscodes/HokenLifeCRM` (2026-03-02)
+- [x] Contacts CRUD — full table, search, create/edit/delete (2026-03-02)
+- [x] Policies CRUD — linked to contacts, status tracking, premiums (2026-03-02)
+- [x] Claims CRUD — linked to policies, status workflow (2026-03-02)
+- [x] Leads pipeline — linked to contacts, assignable, value tracking (2026-03-02)
+- [x] Dashboard wired with real KPI data from Supabase (2026-03-02)
