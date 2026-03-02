@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Users, FileText, ShieldAlert, Target } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Users, FileText, ShieldAlert, Target, DollarSign, ArrowUpRight } from "lucide-react";
 
 export default async function DashboardPage() {
   const supabase = await createClient();
@@ -13,31 +14,31 @@ export default async function DashboardPage() {
     user?.email?.split("@")[0] ||
     "there";
 
+  // Fetch real counts
+  const [contactsRes, policiesRes, claimsRes, leadsRes, recentContactsRes, upcomingPoliciesRes, totalPremiumRes] =
+    await Promise.all([
+      supabase.from("contacts").select("*", { count: "exact", head: true }),
+      supabase.from("policies").select("*", { count: "exact", head: true }).eq("status", "active"),
+      supabase.from("claims").select("*", { count: "exact", head: true }).in("status", ["open", "in_review"]),
+      supabase.from("leads").select("*", { count: "exact", head: true }).in("status", ["new", "contacted", "qualified", "proposal"]),
+      supabase.from("contacts").select("id, first_name, last_name, email, type, created_at").order("created_at", { ascending: false }).limit(5),
+      supabase.from("policies").select("id, policy_number, end_date, contacts(first_name, last_name)").eq("status", "active").order("end_date", { ascending: true }).limit(5),
+      supabase.from("policies").select("premium").eq("status", "active"),
+    ]);
+
+  const totalContacts = contactsRes.count ?? 0;
+  const activePolicies = policiesRes.count ?? 0;
+  const openClaims = claimsRes.count ?? 0;
+  const activeLeads = leadsRes.count ?? 0;
+  const recentContacts = recentContactsRes.data ?? [];
+  const upcomingPolicies = upcomingPoliciesRes.data ?? [];
+  const totalPremium = (totalPremiumRes.data ?? []).reduce((sum, p) => sum + (p.premium || 0), 0);
+
   const stats = [
-    {
-      label: "Total Contacts",
-      value: "0",
-      icon: Users,
-      change: "+0%",
-    },
-    {
-      label: "Active Policies",
-      value: "0",
-      icon: FileText,
-      change: "+0%",
-    },
-    {
-      label: "Open Claims",
-      value: "0",
-      icon: ShieldAlert,
-      change: "+0%",
-    },
-    {
-      label: "Active Leads",
-      value: "0",
-      icon: Target,
-      change: "+0%",
-    },
+    { label: "Total Contacts", value: totalContacts.toString(), icon: Users },
+    { label: "Active Policies", value: activePolicies.toString(), icon: FileText },
+    { label: "Open Claims", value: openClaims.toString(), icon: ShieldAlert },
+    { label: "Active Leads", value: activeLeads.toString(), icon: Target },
   ];
 
   return (
@@ -62,34 +63,98 @@ export default async function DashboardPage() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{stat.value}</div>
-              <p className="text-xs text-muted-foreground">
-                {stat.change} from last month
-              </p>
             </CardContent>
           </Card>
         ))}
       </div>
 
-      {/* Placeholder sections */}
-      <div className="grid gap-4 lg:grid-cols-2">
-        <Card className="border-border/50 bg-card/80 backdrop-blur-sm">
-          <CardHeader>
-            <CardTitle className="text-lg">Recent Activity</CardTitle>
+      {/* Total Premium Card */}
+      {totalPremium > 0 && (
+        <Card className="border-border/50 bg-gradient-to-r from-[#92FE9D]/5 to-[#00C9FF]/5 backdrop-blur-sm">
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              Total Active Premiums
+            </CardTitle>
+            <DollarSign className="h-4 w-4 text-primary" />
           </CardHeader>
           <CardContent>
-            <p className="text-sm text-muted-foreground">
-              No recent activity yet. Start by adding your first contact.
-            </p>
+            <div className="text-3xl font-bold bg-gradient-to-r from-[#92FE9D] to-[#00C9FF] bg-clip-text text-transparent">
+              ${totalPremium.toLocaleString()}
+            </div>
+            <p className="text-xs text-muted-foreground">across {activePolicies} active policies</p>
           </CardContent>
         </Card>
+      )}
+
+      {/* Bottom Grid */}
+      <div className="grid gap-4 lg:grid-cols-2">
+        {/* Recent Contacts */}
         <Card className="border-border/50 bg-card/80 backdrop-blur-sm">
-          <CardHeader>
-            <CardTitle className="text-lg">Upcoming Renewals</CardTitle>
+          <CardHeader className="flex flex-row items-center justify-between">
+            <CardTitle className="text-lg">Recent Contacts</CardTitle>
+            <a href="/dashboard/contacts" className="text-sm text-primary hover:underline flex items-center gap-1">
+              View all <ArrowUpRight className="h-3 w-3" />
+            </a>
           </CardHeader>
           <CardContent>
-            <p className="text-sm text-muted-foreground">
-              No upcoming renewals. Add policies to track renewals automatically.
-            </p>
+            {recentContacts.length === 0 ? (
+              <p className="text-sm text-muted-foreground">
+                No contacts yet. Start by adding your first contact.
+              </p>
+            ) : (
+              <div className="space-y-3">
+                {recentContacts.map((contact) => (
+                  <div key={contact.id} className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm font-medium">{contact.first_name} {contact.last_name}</p>
+                      <p className="text-xs text-muted-foreground">{contact.email || "No email"}</p>
+                    </div>
+                    <Badge variant="secondary" className="capitalize text-xs">{contact.type}</Badge>
+                  </div>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Upcoming Renewals */}
+        <Card className="border-border/50 bg-card/80 backdrop-blur-sm">
+          <CardHeader className="flex flex-row items-center justify-between">
+            <CardTitle className="text-lg">Upcoming Renewals</CardTitle>
+            <a href="/dashboard/policies" className="text-sm text-primary hover:underline flex items-center gap-1">
+              View all <ArrowUpRight className="h-3 w-3" />
+            </a>
+          </CardHeader>
+          <CardContent>
+            {upcomingPolicies.length === 0 ? (
+              <p className="text-sm text-muted-foreground">
+                No upcoming renewals. Add policies to track renewals automatically.
+              </p>
+            ) : (
+              <div className="space-y-3">
+                {upcomingPolicies.map((policy) => {
+                  const endDate = new Date(policy.end_date);
+                  const daysUntil = Math.ceil((endDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24));
+                  const isUrgent = daysUntil <= 30;
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                  const contactData = policy.contacts as any;
+                  const contact = Array.isArray(contactData) ? contactData[0] : contactData;
+                  return (
+                    <div key={policy.id} className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm font-medium font-mono">{policy.policy_number}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {contact ? `${contact.first_name} ${contact.last_name}` : "Unknown"}
+                        </p>
+                      </div>
+                      <Badge variant={isUrgent ? "destructive" : "secondary"} className="text-xs">
+                        {daysUntil <= 0 ? "Expired" : `${daysUntil}d left`}
+                      </Badge>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>

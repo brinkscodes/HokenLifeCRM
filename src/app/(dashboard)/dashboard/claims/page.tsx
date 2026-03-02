@@ -1,13 +1,26 @@
-export default function ClaimsPage() {
+import { getClaims, getPoliciesForSelect } from "./actions";
+import { ClaimsTable } from "./claims-table";
+
+export default async function ClaimsPage() {
+  let claims: Awaited<ReturnType<typeof getClaims>> = [];
+  let policies: Awaited<ReturnType<typeof getPoliciesForSelect>> = [];
+
+  try {
+    [claims, policies] = await Promise.all([
+      getClaims(),
+      getPoliciesForSelect(),
+    ]);
+  } catch {
+    // Will be empty on first load
+  }
+
   return (
     <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold">Claims</h1>
         <p className="text-muted-foreground">Track and process insurance claims.</p>
       </div>
-      <div className="rounded-lg border border-border/50 bg-card/80 p-8 text-center backdrop-blur-sm">
-        <p className="text-muted-foreground">Claims tracking coming soon.</p>
-      </div>
+      <ClaimsTable claims={claims} policies={policies} />
     </div>
   );
 }
